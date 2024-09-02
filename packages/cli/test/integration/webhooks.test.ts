@@ -1,18 +1,18 @@
+import { Container } from 'typedi';
 import type SuperAgentTest from 'supertest/lib/agent';
 import { agent as testAgent } from 'supertest';
 import { mock } from 'jest-mock-extended';
+import { GlobalConfig } from '@n8n/config';
 
-import { AbstractServer } from '@/abstract-server';
 import { LiveWebhooks } from '@/webhooks/live-webhooks';
 import { ExternalHooks } from '@/external-hooks';
 import { TestWebhooks } from '@/webhooks/test-webhooks';
 import { WaitingWebhooks } from '@/webhooks/waiting-webhooks';
 import { WaitingForms } from '@/waiting-forms';
 import type { IWebhookResponseCallbackData } from '@/webhooks/webhook.types';
+import { WebhookServer } from '@/webhooks/webhook-server';
 
 import { mockInstance } from '@test/mocking';
-import { GlobalConfig } from '@n8n/config';
-import Container from 'typedi';
 
 let agent: SuperAgentTest;
 
@@ -27,9 +27,9 @@ describe('WebhookServer', () => {
 		mockInstance(WaitingForms);
 
 		beforeAll(async () => {
-			const server = new (class extends AbstractServer {
-				testWebhooksEnabled = true;
-			})();
+			const server = new WebhookServer();
+			// @ts-expect-error: testWebhooksEnabled is private
+			server.testWebhooksEnabled = true;
 			await server.start();
 			agent = testAgent(server.app);
 		});

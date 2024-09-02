@@ -7,7 +7,6 @@ import {
 	type IWebhookFunctions,
 } from 'n8n-workflow';
 
-import { AbstractServer } from '@/abstract-server';
 import { ExternalHooks } from '@/external-hooks';
 import { NodeTypes } from '@/node-types';
 import { Push } from '@/push';
@@ -20,6 +19,7 @@ import { createUser } from './shared/db/users';
 import { createWorkflow } from './shared/db/workflows';
 import type { SuperAgentTest } from './shared/types';
 import { Telemetry } from '@/telemetry';
+import { WebhookServer } from '@/webhooks/webhook-server';
 
 mockInstance(Telemetry);
 
@@ -49,7 +49,7 @@ describe('Webhook API', () => {
 
 			await initActiveWorkflowManager();
 
-			const server = new (class extends AbstractServer {})();
+			const server = new WebhookServer();
 			await server.start();
 			agent = testAgent(server.app);
 		});
@@ -152,7 +152,7 @@ describe('Webhook API', () => {
 
 			await initActiveWorkflowManager();
 
-			const server = new (class extends AbstractServer {})();
+			const server = new WebhookServer();
 			await server.start();
 			agent = testAgent(server.app);
 		});
