@@ -1,15 +1,17 @@
+import { Container } from 'typedi';
+import { InstanceSettings } from 'n8n-core';
+
 import { ExternalSecretsManager } from '@/external-secrets/external-secrets-manager.ee';
+import { Logger } from '@/logger';
 import { License } from '@/license';
 import { MessageEventBus } from '@/eventbus/message-event-bus/message-event-bus';
-import Container from 'typedi';
-import { Logger } from 'winston';
 import { messageToRedisServiceCommandObject, debounceMessageReceiver } from '../helpers';
 import config from '@/config';
 import { CommunityPackagesService } from '@/services/community-packages.service';
 
 export async function handleCommandMessageWebhook(messageString: string) {
 	const queueModeId = config.getEnv('redis.queueModeId');
-	const isMainInstance = config.getEnv('generic.instanceType') === 'main';
+	const isMainInstance = Container.get(InstanceSettings).instanceType === 'main';
 	const message = messageToRedisServiceCommandObject(messageString);
 	const logger = Container.get(Logger);
 

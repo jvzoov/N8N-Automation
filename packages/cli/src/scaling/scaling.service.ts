@@ -29,8 +29,6 @@ import { EventService } from '@/events/event.service';
 export class ScalingService {
 	private queue: JobQueue;
 
-	private readonly instanceType = config.getEnv('generic.instanceType');
-
 	constructor(
 		private readonly logger: Logger,
 		private readonly activeExecutions: ActiveExecutions,
@@ -209,9 +207,10 @@ export class ScalingService {
 			throw error;
 		});
 
-		if (this.instanceType === 'main') {
+		const { instanceType } = this.instanceSettings;
+		if (instanceType === 'main') {
 			this.registerMainListeners();
-		} else if (this.instanceType === 'worker') {
+		} else if (instanceType === 'worker') {
 			this.registerWorkerListeners();
 		}
 	}
@@ -293,7 +292,7 @@ export class ScalingService {
 	}
 
 	private assertWorker() {
-		if (this.instanceType === 'worker') return;
+		if (this.instanceSettings.instanceType === 'worker') return;
 
 		throw new ApplicationError('This method must be called on a `worker` instance');
 	}
@@ -309,7 +308,7 @@ export class ScalingService {
 	get isQueueMetricsEnabled() {
 		return (
 			this.globalConfig.endpoints.metrics.includeQueueMetrics &&
-			this.instanceType === 'main' &&
+			this.instanceSettings.instanceType === 'main' &&
 			!this.orchestrationService.isMultiMainSetupEnabled
 		);
 	}

@@ -13,7 +13,7 @@ import { InstanceSettings } from 'n8n-core';
 export class OrchestrationService {
 	constructor(
 		private readonly logger: Logger,
-		private readonly instanceSettings: InstanceSettings,
+		protected readonly instanceSettings: InstanceSettings,
 		private readonly redisService: RedisService,
 		readonly multiMainSetup: MultiMainSetup,
 	) {}
@@ -30,7 +30,7 @@ export class OrchestrationService {
 		return (
 			config.getEnv('executions.mode') === 'queue' &&
 			config.getEnv('multiMainSetup.enabled') &&
-			config.getEnv('generic.instanceType') === 'main' &&
+			this.instanceSettings.instanceType === 'main' &&
 			this.isMultiMainSetupLicensed
 		);
 	}

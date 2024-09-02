@@ -21,6 +21,7 @@ import { mockInstance } from '@test/mocking';
 import { RedisClientService } from '@/services/redis/redis-client.service';
 import type { MainResponseReceivedHandlerOptions } from '../orchestration/main/types';
 
+const logger = mockInstance(Logger);
 const instanceSettings = Container.get(InstanceSettings);
 const redisClientService = mockInstance(RedisClientService);
 const mockRedisClient = mock<Redis>();
@@ -34,7 +35,7 @@ let queueModeId: string;
 
 function setDefaultConfig() {
 	config.set('executions.mode', 'queue');
-	config.set('generic.instanceType', 'main');
+	instanceSettings.setInstanceType('main');
 }
 
 const workerRestartEventBusResponse: RedisServiceWorkerResponseObject = {
@@ -47,7 +48,6 @@ const workerRestartEventBusResponse: RedisServiceWorkerResponseObject = {
 };
 
 describe('Orchestration Service', () => {
-	const logger = mockInstance(Logger);
 	mockInstance(Push);
 	mockInstance(RedisService);
 	mockInstance(ExternalSecretsManager);

@@ -1,10 +1,12 @@
 import { Container } from 'typedi';
+import { InstanceSettings } from 'n8n-core';
+
 import { debounceMessageReceiver, messageToRedisServiceCommandObject } from '../helpers';
 import config from '@/config';
 import { MessageEventBus } from '@/eventbus/message-event-bus/message-event-bus';
 import { ExternalSecretsManager } from '@/external-secrets/external-secrets-manager.ee';
-import { License } from '@/license';
 import { Logger } from '@/logger';
+import { License } from '@/license';
 import { ActiveWorkflowManager } from '@/active-workflow-manager';
 import { Push } from '@/push';
 import { TestWebhooks } from '@/webhooks/test-webhooks';
@@ -15,7 +17,7 @@ import { CommunityPackagesService } from '@/services/community-packages.service'
 // eslint-disable-next-line complexity
 export async function handleCommandMessageMain(messageString: string) {
 	const queueModeId = config.getEnv('redis.queueModeId');
-	const isMainInstance = config.getEnv('generic.instanceType') === 'main';
+	const isMainInstance = Container.get(InstanceSettings).instanceType === 'main';
 	const message = messageToRedisServiceCommandObject(messageString);
 	const logger = Container.get(Logger);
 
