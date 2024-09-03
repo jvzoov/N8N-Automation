@@ -1,6 +1,6 @@
 import { customAlphabet } from 'nanoid';
 import { ALPHABET } from 'n8n-workflow';
-import type { N8nInstanceType } from '@/interfaces';
+import type { InstanceType } from 'n8n-core';
 
 const nanoid = customAlphabet(ALPHABET, 16);
 
@@ -8,6 +8,6 @@ export function generateNanoId() {
 	return nanoid();
 }
 
-export function generateHostInstanceId(instanceType: N8nInstanceType) {
+export function generateHostInstanceId(instanceType: InstanceType) {
 	return `${instanceType}-${nanoid()}`;
 }

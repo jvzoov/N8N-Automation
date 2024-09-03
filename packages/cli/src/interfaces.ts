@@ -630,5 +630,3 @@ export abstract class SecretsProvider {
 	abstract hasSecret(name: string): boolean;
 	abstract getSecretNames(): string[];
 }
-
-export type N8nInstanceType = 'main' | 'webhook' | 'worker';

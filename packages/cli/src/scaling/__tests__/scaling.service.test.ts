@@ -1,7 +1,6 @@
 import { mock } from 'jest-mock-extended';
 import { ScalingService } from '../scaling.service';
 import { JOB_TYPE_NAME, QUEUE_NAME } from '../constants';
-import config from '@/config';
 import * as BullModule from 'bull';
 import type { Job, JobData, JobOptions, JobQueue } from '../scaling.types';
 import { ApplicationError } from 'n8n-workflow';
@@ -68,7 +67,7 @@ describe('ScalingService', () => {
 
 	beforeEach(() => {
 		jest.clearAllMocks();
-		config.set('generic.instanceType', 'main');
+		instanceSettings.setInstanceType('main');
 		instanceSettings.markAsLeader();
 
 		scalingService = new ScalingService(
@@ -123,8 +122,7 @@ describe('ScalingService', () => {
 
 		describe('if worker', () => {
 			it('should set up queue + listeners', async () => {
-				// @ts-expect-error Private field
-				scalingService.instanceType = 'worker';
+				instanceSettings.setInstanceType('worker');
 
 				await scalingService.setupQueue();
 
@@ -137,8 +135,7 @@ describe('ScalingService', () => {
 
 	describe('setupWorker', () => {
 		it('should set up a worker with concurrency', async () => {
-			// @ts-expect-error Private field
-			scalingService.instanceType = 'worker';
+			instanceSettings.setInstanceType('worker');
 			await scalingService.setupQueue();
 			const concurrency = 5;
 
@@ -154,8 +151,7 @@ describe('ScalingService', () => {
 		});
 
 		it('should throw if called before queue is ready', async () => {
-			// @ts-expect-error Private field
-			scalingService.instanceType = 'worker';
+			instanceSettings.setInstanceType('worker');
 
 			expect(() => scalingService.setupWorker(5)).toThrow();
 		});

@@ -5,11 +5,12 @@ import express from 'express';
 import { engine as expressHandlebars } from 'express-handlebars';
 import compression from 'compression';
 import isbot from 'isbot';
+import { GlobalConfig } from '@n8n/config';
+import type { InstanceType } from 'n8n-core';
 
 import config from '@/config';
 import { N8N_VERSION, TEMPLATES_DIR, inDevelopment, inTest } from '@/constants';
 import * as Db from '@/db';
-import { N8nInstanceType } from '@/interfaces';
 import { ExternalHooks } from '@/external-hooks';
 import { send, sendErrorResponse } from '@/response-helper';
 import { rawBodyReader, bodyParser, corsMiddleware } from '@/middlewares';
@@ -22,7 +23,6 @@ import { generateHostInstanceId } from './databases/utils/generators';
 import { Logger } from '@/logger';
 import { ServiceUnavailableError } from './errors/response-errors/service-unavailable.error';
 import { OnShutdown } from '@/decorators/on-shutdown';
-import { GlobalConfig } from '@n8n/config';
 
 @Service()
 export abstract class AbstractServer {
@@ -60,7 +60,7 @@ export abstract class AbstractServer {
 
 	readonly uniqueInstanceId: string;
 
-	constructor(instanceType: N8nInstanceType = 'main') {
+	constructor(instanceType: Exclude<InstanceType, 'worker'>) {
 		this.app = express();
 		this.app.disable('x-powered-by');
 

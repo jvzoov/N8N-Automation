@@ -16,6 +16,8 @@ type Settings = ReadOnlySettings & WritableSettings;
 
 type InstanceRole = 'unset' | 'leader' | 'follower';
 
+export type InstanceType = 'main' | 'webhook' | 'worker';
+
 const inTest = process.env.NODE_ENV === 'test';
 
 @Service()
@@ -64,6 +66,13 @@ export class InstanceSettings {
 
 	markAsFollower() {
 		this.instanceRole = 'follower';
+	}
+
+	// TODO: read from process.env instead, and make it readonly
+	instanceType?: InstanceType;
+
+	setInstanceType(instanceType: InstanceType) {
+		this.instanceType = instanceType;
 	}
 
 	get encryptionKey() {

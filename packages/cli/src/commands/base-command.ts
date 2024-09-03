@@ -14,7 +14,6 @@ import { initErrorHandling } from '@/error-reporting';
 import { ExternalHooks } from '@/external-hooks';
 import { NodeTypes } from '@/node-types';
 import { LoadNodesAndCredentials } from '@/load-nodes-and-credentials';
-import type { N8nInstanceType } from '@/interfaces';
 import { PostHogClient } from '@/posthog';
 import { License } from '@/license';
 import { ExternalSecretsManager } from '@/external-secrets/external-secrets-manager.ee';
@@ -33,8 +32,6 @@ export abstract class BaseCommand extends Command {
 	protected nodeTypes: NodeTypes;
 
 	protected instanceSettings: InstanceSettings;
-
-	private instanceType: N8nInstanceType = 'main';
 
 	queueModeId: string;
 
@@ -127,17 +124,12 @@ export abstract class BaseCommand extends Command {
 		await Container.get(TelemetryEventRelay).init();
 	}
 
-	protected setInstanceType(instanceType: N8nInstanceType) {
-		this.instanceType = instanceType;
-		config.set('generic.instanceType', instanceType);
-	}
-
 	protected setInstanceQueueModeId() {
 		if (config.get('redis.queueModeId')) {
 			this.queueModeId = config.get('redis.queueModeId');
 			return;
 		}
-		this.queueModeId = generateHostInstanceId(this.instanceType);
+		this.queueModeId = generateHostInstanceId(this.instanceSettings.instanceType!);
 		config.set('redis.queueModeId', this.queueModeId);
 	}
 
@@ -277,7 +269,7 @@ export abstract class BaseCommand extends Command {
 
 	async initLicense(): Promise<void> {
 		this.license = Container.get(License);
-		await this.license.init(this.instanceType ?? 'main');
+		await this.license.init();
 
 		const activationKey = config.getEnv('license.activationKey');
 
