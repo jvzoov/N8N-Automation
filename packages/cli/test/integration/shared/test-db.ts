@@ -60,6 +60,7 @@ const repositories = [
 	'Project',
 	'ProjectRelation',
 	'Role',
+	'ProcessedData',
 	'Project',
 	'ProjectRelation',
 	'Settings',
