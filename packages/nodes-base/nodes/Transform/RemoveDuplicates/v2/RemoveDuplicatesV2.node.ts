@@ -298,16 +298,16 @@ const versionDescription: INodeTypeDescription = {
 				},
 			},
 			options: [
-				{
-					name: 'Update Key Values in Database',
-					value: 'updateKeyValuesInDatabase',
-					description: 'Store item key values in the database without removing items',
-				},
-				{
-					name: 'Delete Key Values From Database',
-					value: 'deleteKeyValuesFromDatabase',
-					description: 'Delete input item key values from the database without removing items',
-				},
+				// {
+				// 	name: 'Update Key Values in Database',
+				// 	value: 'updateKeyValuesInDatabase',
+				// 	description: 'Store item key values in the database without removing items',
+				// },
+				// {
+				// 	name: 'Delete Key Values From Database',
+				// 	value: 'deleteKeyValuesFromDatabase',
+				// 	description: 'Delete input item key values from the database without removing items',
+				// },
 				{
 					name: 'Clean Database',
 					value: 'cleanDatabase',
@@ -315,68 +315,68 @@ const versionDescription: INodeTypeDescription = {
 				},
 			],
 		},
-		{
-			displayName: 'Logic',
-			name: 'updateKeyValuesInDatabaseLogic',
-			type: 'options',
-			default: 'addNewKeyValues',
-			description: 'The logic to follow to update the key values in the database',
-			displayOptions: {
-				show: {
-					mode: ['updateKeyValuesInDatabase'],
-				},
-			},
-			options: [
-				{
-					name: 'Add New Key Values',
-					value: 'addNewKeyValues',
-					description: 'Store all the new key values from incoming items in the database',
-				},
-				{
-					name: 'Update Incremental Key Value With Highest',
-					value: 'updateIncrementalKeyValueWithHighest',
-					description:
-						'Works with incremental key values, replace the key value in the database with the highest from incoming items',
-				},
-				{
-					name: 'Update Date Key Value With Latest',
-					value: 'updateDateKeyValueWithLatest',
-					description:
-						'Works with date key values, replace the key value in the database with the latest from incoming items',
-				},
-			],
-		},
-		{
-			displayName: 'Logic',
-			name: 'deleteKeyValuesFromDatabaseLogic',
-			type: 'options',
-			default: 'removeAllMatchingKeyValues',
-			description: 'The logic to follow to remove the keys from the database',
-			displayOptions: {
-				show: {
-					mode: ['deleteKeyValuesFromDatabase'],
-				},
-			},
-			options: [
-				{
-					name: 'Remove All Matching Key Values',
-					value: 'removeAllMatchingKeyValues',
-					description: 'Remove all the key values from incoming items from the database',
-				},
-				{
-					name: 'Reset Incremental Key Value to Lowest',
-					value: 'resetIncrementalKeyValueToLowest',
-					description:
-						'Works with incremental key values, replace the key value in the database with the lowest from incoming items',
-				},
-				{
-					name: 'Reset Incremental Key Value to Less Recent',
-					value: 'resetIncrementalKeyValueToLessRecent',
-					description:
-						'Works with date key values, replace the key value in the database with the less recent date from incoming items',
-				},
-			],
-		},
+		// {
+		// 	displayName: 'Logic',
+		// 	name: 'updateKeyValuesInDatabaseLogic',
+		// 	type: 'options',
+		// 	default: 'addNewKeyValues',
+		// 	description: 'The logic to follow to update the key values in the database',
+		// 	displayOptions: {
+		// 		show: {
+		// 			mode: ['updateKeyValuesInDatabase'],
+		// 		},
+		// 	},
+		// 	options: [
+		// 		{
+		// 			name: 'Add New Key Values',
+		// 			value: 'addNewKeyValues',
+		// 			description: 'Store all the new key values from incoming items in the database',
+		// 		},
+		// 		{
+		// 			name: 'Update Incremental Key Value With Highest',
+		// 			value: 'updateIncrementalKeyValueWithHighest',
+		// 			description:
+		// 				'Works with incremental key values, replace the key value in the database with the highest from incoming items',
+		// 		},
+		// 		{
+		// 			name: 'Update Date Key Value With Latest',
+		// 			value: 'updateDateKeyValueWithLatest',
+		// 			description:
+		// 				'Works with date key values, replace the key value in the database with the latest from incoming items',
+		// 		},
+		// 	],
+		// },
+		// {
+		// 	displayName: 'Logic',
+		// 	name: 'deleteKeyValuesFromDatabaseLogic',
+		// 	type: 'options',
+		// 	default: 'removeAllMatchingKeyValues',
+		// 	description: 'The logic to follow to remove the keys from the database',
+		// 	displayOptions: {
+		// 		show: {
+		// 			mode: ['deleteKeyValuesFromDatabase'],
+		// 		},
+		// 	},
+		// 	options: [
+		// 		{
+		// 			name: 'Remove All Matching Key Values',
+		// 			value: 'removeAllMatchingKeyValues',
+		// 			description: 'Remove all the key values from incoming items from the database',
+		// 		},
+		// 		{
+		// 			name: 'Reset Incremental Key Value to Lowest',
+		// 			value: 'resetIncrementalKeyValueToLowest',
+		// 			description:
+		// 				'Works with incremental key values, replace the key value in the database with the lowest from incoming items',
+		// 		},
+		// 		{
+		// 			name: 'Reset Incremental Key Value to Less Recent',
+		// 			value: 'resetIncrementalKeyValueToLessRecent',
+		// 			description:
+		// 				'Works with date key values, replace the key value in the database with the less recent date from incoming items',
+		// 		},
+		// 	],
+		// },
 	],
 };
 export class RemoveDuplicatesV2 implements INodeType {
@@ -538,14 +538,23 @@ export class RemoveDuplicatesV2 implements INodeType {
 					}
 					// TODO: Add continueOnFail, where should it and up?
 				}
-				const addProcessedValue = true;
+				const addProcessedValue = !this.getNodeParameter(
+					'dedupeOptions.dontUpdateKeyValuesOnDatabase',
+					0,
+					false,
+				);
+				const maxEntries = this.getNodeParameter(
+					'dedupeOptions.maxKeyValuesToStoreInDatabase',
+					0,
+					1000,
+				);
 
 				let itemsProcessed: ICheckProcessedOutput;
 				if (addProcessedValue) {
 					itemsProcessed = await this.helpers.checkProcessedAndRecord(
 						Object.keys(itemMapping),
 						context as ProcessedDataContext,
-						{ mode: 'entries', maxEntries: 1000 } as ICheckProcessedOptions,
+						{ mode: 'entries', maxEntries } as ICheckProcessedOptions,
 					);
 				} else {
 					itemsProcessed = await this.helpers.checkProcessed(
@@ -590,14 +599,23 @@ export class RemoveDuplicatesV2 implements INodeType {
 					}
 					// TODO: Add continueOnFail, where should it and up?
 				}
-				const addProcessedValue = true;
+				const addProcessedValue = !this.getNodeParameter(
+					'dedupeOptions.dontUpdateKeyValuesOnDatabase',
+					0,
+					false,
+				);
+				const maxEntries = this.getNodeParameter(
+					'dedupeOptions.maxKeyValuesToStoreInDatabase',
+					0,
+					1000,
+				);
 
 				let itemsProcessed: ICheckProcessedOutput;
 				if (addProcessedValue) {
 					itemsProcessed = await this.helpers.checkProcessedAndRecord(
 						Object.keys(itemMapping),
 						context as ProcessedDataContext,
-						{ mode: 'latest', maxEntries: 1000 } as ICheckProcessedOptions,
+						{ mode: 'latest', maxEntries } as ICheckProcessedOptions,
 					);
 				} else {
 					itemsProcessed = await this.helpers.checkProcessed(
@@ -641,14 +659,22 @@ export class RemoveDuplicatesV2 implements INodeType {
 					}
 					// TODO: Add continueOnFail, where should it and up?
 				}
-				const addProcessedValue = true;
-
+				const addProcessedValue = !this.getNodeParameter(
+					'dedupeOptions.dontUpdateKeyValuesOnDatabase',
+					0,
+					false,
+				);
+				const maxEntries = this.getNodeParameter(
+					'dedupeOptions.maxKeyValuesToStoreInDatabase',
+					0,
+					1000,
+				);
 				let itemsProcessed: ICheckProcessedOutput;
 				if (addProcessedValue) {
 					itemsProcessed = await this.helpers.checkProcessedAndRecord(
 						Object.keys(itemMapping),
 						context as ProcessedDataContext,
-						{ mode: 'latest', maxEntries: 1000 } as ICheckProcessedOptions,
+						{ mode: 'latest', maxEntries } as ICheckProcessedOptions,
 					);
 				} else {
 					itemsProcessed = await this.helpers.checkProcessed(
