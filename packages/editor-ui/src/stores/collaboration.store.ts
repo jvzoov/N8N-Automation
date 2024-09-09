@@ -1,17 +1,17 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 import { useRoute } from 'vue-router';
+import type { Collaborator } from '@n8n/api-types';
 
 import { STORES, PLACEHOLDER_EMPTY_WORKFLOW_ID, TIME } from '@/constants';
 import { useBeforeUnload } from '@/composables/useBeforeUnload';
-import type { IUser } from '@/Interface';
 import { useWorkflowsStore } from '@/stores/workflows.store';
 import { usePushConnectionStore } from '@/stores/pushConnection.store';
 import { useUsersStore } from '@/stores/users.store';
 import { useUIStore } from '@/stores/ui.store';
 
-type ActiveUsersForWorkflows = {
-	[workflowId: string]: Array<{ user: IUser; lastSeen: string }>;
+type CollaboratorsForWorkflows = {
+	[workflowId: string]: Collaborator[];
 };
 
 /**
@@ -36,12 +36,12 @@ export const useCollaborationStore = defineStore(STORES.COLLABORATION, () => {
 		}
 	});
 
-	const usersForWorkflows = ref<ActiveUsersForWorkflows>({});
+	const collaboratorsForWorkflows = ref<CollaboratorsForWorkflows>({});
 	const pushStoreEventListenerRemovalFn = ref<(() => void) | null>(null);
 
-	const getUsersForCurrentWorkflow = computed(() => {
-		return usersForWorkflows.value[workflowsStore.workflowId] ?? [];
-	});
+	const getCollaborators = computed(
+		() => collaboratorsForWorkflows.value[workflowsStore.workflowId] ?? [],
+	);
 
 	const HEARTBEAT_INTERVAL = 5 * TIME.MINUTE;
 	const heartbeatTimer = ref<number | null>(null);
@@ -66,9 +66,9 @@ export const useCollaborationStore = defineStore(STORES.COLLABORATION, () => {
 		}
 
 		pushStoreEventListenerRemovalFn.value = pushStore.addEventListener((event) => {
-			if (event.type === 'activeWorkflowUsersChanged') {
+			if (event.type === 'collaboratorsChanged') {
 				const workflowId = event.data.workflowId;
-				usersForWorkflows.value[workflowId] = event.data.activeUsers;
+				collaboratorsForWorkflows.value[workflowId] = event.data.collaborators;
 			}
 		});
 
@@ -89,14 +89,14 @@ export const useCollaborationStore = defineStore(STORES.COLLABORATION, () => {
 		}
 	}
 
-	function functionRemoveCurrentUserFromActiveUsers(workflowId: string) {
-		const workflowUsers = usersForWorkflows.value[workflowId];
-		if (!workflowUsers) {
+	function removeCurrentUserFromCollaborators(workflowId: string) {
+		const collaborators = collaboratorsForWorkflows.value[workflowId];
+		if (!collaborators) {
 			return;
 		}
 
-		usersForWorkflows.value[workflowId] = workflowUsers.filter(
-			(activeUser) => activeUser.user.id !== usersStore.currentUserId,
+		collaboratorsForWorkflows.value[workflowId] = collaborators.filter(
+			({ user }) => user.id !== usersStore.currentUserId,
 		);
 	}
 
@@ -114,14 +114,14 @@ export const useCollaborationStore = defineStore(STORES.COLLABORATION, () => {
 		if (workflowId === PLACEHOLDER_EMPTY_WORKFLOW_ID) return;
 		pushStore.send({ type: 'workflowClosed', workflowId });
 
-		functionRemoveCurrentUserFromActiveUsers(workflowId);
+		removeCurrentUserFromCollaborators(workflowId);
 	}
 
 	return {
-		usersForWorkflows,
+		collaboratorsForWorkflows,
 		initialize,
 		terminate,
-		getUsersForCurrentWorkflow,
+		getCollaborators,
 		startHeartbeat,
 		stopHeartbeat,
 	};

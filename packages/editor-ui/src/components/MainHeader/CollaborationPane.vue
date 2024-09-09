@@ -19,8 +19,8 @@ watch(visibility, (visibilityState) => {
 });
 
 const activeUsersSorted = computed(() => {
-	const currentWorkflowUsers = (collaborationStore.getUsersForCurrentWorkflow ?? []).map(
-		(userInfo) => userInfo.user,
+	const currentWorkflowUsers = (collaborationStore.getCollaborators ?? []).map(
+		({ user }) => usersStore.usersById[user.id],
 	);
 	const owner = currentWorkflowUsers.find(isUserGlobalOwner);
 	return {
