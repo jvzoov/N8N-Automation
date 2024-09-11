@@ -438,6 +438,7 @@ type PushDataCollaboratorsChanged = {
 };
 
 export type IPushData =
+	| PushDataExecutionCanceled
 	| PushDataExecutionFinished
 	| PushDataExecutionStarted
 	| PushDataExecuteAfter
@@ -467,6 +468,11 @@ export type PushDataActiveWorkflowRemoved = {
 export type PushDataWorkflowFailedToActivate = {
 	data: IWorkflowFailedToActivate;
 	type: 'workflowFailedToActivate';
+};
+
+export type PushDataExecutionCanceled = {
+	data: IPushDataExecutionCanceled;
+	type: 'executionCanceled';
 };
 
 export type PushDataExecutionRecovered = {
@@ -532,6 +538,11 @@ export interface IPushDataExecutionStarted {
 	workflowId: string;
 	workflowName?: string;
 }
+
+export interface IPushDataExecutionCanceled {
+	executionId: string;
+}
+
 export interface IPushDataExecutionRecovered {
 	executionId: string;
 }
