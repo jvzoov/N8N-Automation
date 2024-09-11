@@ -1,5 +1,6 @@
 /* eslint-disable n8n-nodes-base/node-filename-against-convention */
 import {
+	ADD_FORM_NOTICE,
 	NodeConnectionType,
 	type INodeProperties,
 	type INodeType,
@@ -110,6 +111,13 @@ const descriptionV2: INodeTypeDescription = {
 			},
 			default: '',
 		},
+		// notice would be shown if no Form node was connected to trigger
+		{
+			displayName: 'Add an n8n Form Page to the workflow to build a multi-step form',
+			name: ADD_FORM_NOTICE,
+			type: 'notice',
+			default: '',
+		},
 		{
 			displayName: 'Options',
 			name: 'options',
@@ -118,6 +126,13 @@ const descriptionV2: INodeTypeDescription = {
 			default: {},
 			options: [
 				appendAttributionToForm,
+				{
+					displayName: 'Button Label',
+					description: 'The label of the submit button in the form',
+					name: 'buttonLabel',
+					type: 'string',
+					default: 'Submit form',
+				},
 				{
 					...respondWithOptions,
 					displayOptions: {
