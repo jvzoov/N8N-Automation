@@ -1,5 +1,6 @@
 import { assert, jsonStringify } from 'n8n-workflow';
-import type { IPushDataType } from '@/interfaces';
+import type { PushType } from '@n8n/api-types';
+
 import type { Logger } from '@/logger';
 import type { User } from '@/databases/entities/user';
 import { TypedEmitter } from '@/typed-emitter';
@@ -59,7 +60,7 @@ export abstract class AbstractPush<T> extends TypedEmitter<AbstractPushEvents> {
 		delete this.userIdByPushRef[pushRef];
 	}
 
-	private sendTo(type: IPushDataType, data: unknown, pushRefs: string[]) {
+	private sendTo(type: PushType, data: unknown, pushRefs: string[]) {
 		this.logger.debug(`Send data of type "${type}" to editor-UI`, {
 			dataType: type,
 			pushRefs: pushRefs.join(', '),
@@ -74,11 +75,11 @@ export abstract class AbstractPush<T> extends TypedEmitter<AbstractPushEvents> {
 		}
 	}
 
-	sendToAll(type: IPushDataType, data?: unknown) {
+	sendToAll(type: PushType, data?: unknown) {
 		this.sendTo(type, data, Object.keys(this.connections));
 	}
 
-	sendToOne(type: IPushDataType, data: unknown, pushRef: string) {
+	sendToOne(type: PushType, data: unknown, pushRef: string) {
 		if (this.connections[pushRef] === undefined) {
 			this.logger.error(`The session "${pushRef}" is not registered.`, { pushRef });
 			return;
@@ -87,7 +88,7 @@ export abstract class AbstractPush<T> extends TypedEmitter<AbstractPushEvents> {
 		this.sendTo(type, data, [pushRef]);
 	}
 
-	sendToUsers(type: IPushDataType, data: unknown, userIds: Array<User['id']>) {
+	sendToUsers(type: PushType, data: unknown, userIds: Array<User['id']>) {
 		const { connections } = this;
 		const userPushRefs = Object.keys(connections).filter((pushRef) =>
 			userIds.includes(this.userIdByPushRef[pushRef]),

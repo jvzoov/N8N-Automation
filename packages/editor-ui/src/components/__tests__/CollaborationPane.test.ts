@@ -60,12 +60,12 @@ const initialState = {
 		},
 	},
 	[STORES.COLLABORATION]: {
-		usersForWorkflows: {
+		collaboratorsForWorkflows: {
 			w1: [
-				{ lastSeen: '2023-11-22T10:17:12.246Z', user: MEMBER_USER },
-				{ lastSeen: '2023-11-22T10:17:12.246Z', user: OWNER_USER },
+				{ lastSeen: '2023-11-22T10:17:12.246Z', userId: MEMBER_USER.id },
+				{ lastSeen: '2023-11-22T10:17:12.246Z', userId: OWNER_USER.id },
 			],
-			w2: [{ lastSeen: '2023-11-22T10:17:12.246Z', user: MEMBER_USER_2 }],
+			w2: [{ lastSeen: '2023-11-22T10:17:12.246Z', userId: MEMBER_USER_2.id }],
 		},
 	},
 };

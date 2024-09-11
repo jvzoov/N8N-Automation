@@ -1,10 +1,10 @@
 import { Container } from 'typedi';
 import { EventEmitter } from 'events';
 import type WebSocket from 'ws';
+import type { PushMessage } from '@n8n/api-types';
 
 import { WebSocketPush } from '@/push/websocket.push';
 import { Logger } from '@/logger';
-import type { PushDataExecutionRecovered } from '@/interfaces';
 
 import { mockInstance } from '@test/mocking';
 import type { User } from '@/databases/entities/user';
@@ -29,6 +29,12 @@ describe('WebSocketPush', () => {
 	const pushRef1 = 'test-session1';
 	const pushRef2 = 'test-session2';
 	const userId: User['id'] = 'test-user';
+	const pushMessage: PushMessage = {
+		type: 'executionRecovered',
+		data: {
+			executionId: 'test-execution-id',
+		},
+	};
 
 	mockInstance(Logger);
 	const webSocketPush = Container.get(WebSocketPush);
@@ -62,14 +68,8 @@ describe('WebSocketPush', () => {
 	it('sends data to one connection', () => {
 		webSocketPush.add(pushRef1, userId, mockWebSocket1);
 		webSocketPush.add(pushRef2, userId, mockWebSocket2);
-		const data: PushDataExecutionRecovered = {
-			type: 'executionRecovered',
-			data: {
-				executionId: 'test-execution-id',
-			},
-		};
 
-		webSocketPush.sendToOne('executionRecovered', data, pushRef1);
+		webSocketPush.sendToOne('executionRecovered', pushMessage, pushRef1);
 
 		expect(mockWebSocket1.send).toHaveBeenCalledWith(
 			JSON.stringify({
@@ -88,14 +88,8 @@ describe('WebSocketPush', () => {
 	it('sends data to all connections', () => {
 		webSocketPush.add(pushRef1, userId, mockWebSocket1);
 		webSocketPush.add(pushRef2, userId, mockWebSocket2);
-		const data: PushDataExecutionRecovered = {
-			type: 'executionRecovered',
-			data: {
-				executionId: 'test-execution-id',
-			},
-		};
 
-		webSocketPush.sendToAll('executionRecovered', data);
+		webSocketPush.sendToAll('executionRecovered', pushMessage);
 
 		const expectedMsg = JSON.stringify({
 			type: 'executionRecovered',
@@ -123,14 +117,8 @@ describe('WebSocketPush', () => {
 	it('sends data to all users connections', () => {
 		webSocketPush.add(pushRef1, userId, mockWebSocket1);
 		webSocketPush.add(pushRef2, userId, mockWebSocket2);
-		const data: PushDataExecutionRecovered = {
-			type: 'executionRecovered',
-			data: {
-				executionId: 'test-execution-id',
-			},
-		};
 
-		webSocketPush.sendToUsers('executionRecovered', data, [userId]);
+		webSocketPush.sendToUsers('executionRecovered', pushMessage, [userId]);
 
 		const expectedMsg = JSON.stringify({
 			type: 'executionRecovered',

@@ -33,7 +33,7 @@ describe('CollaborationState', () => {
 			global.Date = mockDateFactory('2023-01-01T00:00:00.000Z');
 
 			// Act
-			await collaborationState.addActiveWorkflowUser(workflowId, 'userId');
+			await collaborationState.addCollaborator(workflowId, 'userId');
 
 			// Assert
 			expect(mockCacheService.setHash).toHaveBeenCalledWith('collaboration:workflow', {
@@ -45,7 +45,7 @@ describe('CollaborationState', () => {
 	describe('removeActiveWorkflowUser', () => {
 		it('should remove workflow user with correct cache key', async () => {
 			// Act
-			await collaborationState.removeActiveWorkflowUser(workflowId, 'userId');
+			await collaborationState.removeCollaborator(workflowId, 'userId');
 
 			// Assert
 			expect(mockCacheService.deleteFromHash).toHaveBeenCalledWith(
@@ -55,10 +55,10 @@ describe('CollaborationState', () => {
 		});
 	});
 
-	describe('getActiveWorkflowUsers', () => {
+	describe('getCollaborators', () => {
 		it('should get workflows with correct cache key', async () => {
 			// Act
-			const users = await collaborationState.getActiveWorkflowUsers(workflowId);
+			const users = await collaborationState.getCollaborators(workflowId);
 
 			// Assert
 			expect(mockCacheService.getHash).toHaveBeenCalledWith('collaboration:workflow');
@@ -77,7 +77,7 @@ describe('CollaborationState', () => {
 			});
 
 			// Act
-			const users = await collaborationState.getActiveWorkflowUsers(workflowId);
+			const users = await collaborationState.getCollaborators(workflowId);
 
 			// Assert
 			expect(users).toEqual([
